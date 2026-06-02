@@ -7,6 +7,12 @@ spring:
     username: postgres
     password: password
 
+  sql:
+    init:
+      mode: always
+      data-locations: classpath:sql/data.sql
+
   jpa:
     hibernate:
       ddl-auto: create-drop
+    defer-datasource-initialization: true
