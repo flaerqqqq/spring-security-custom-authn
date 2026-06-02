@@ -6,7 +6,6 @@ import org.example.springsecuritycustomauthn.model.enums.UserStatus;
 
 import java.time.Instant;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -58,6 +57,7 @@ public class User {
                     referencedColumnName = "id"
             )
     )
+    @Builder.Default
     private Set<Role> roles = new HashSet<>();
 
     public void addRole(Role role) {
