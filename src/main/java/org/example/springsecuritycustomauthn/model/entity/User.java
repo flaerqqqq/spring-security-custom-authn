@@ -5,13 +5,17 @@ import lombok.*;
 import org.example.springsecuritycustomauthn.model.enums.UserStatus;
 
 import java.time.Instant;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @Entity
 @Table(name = "users")
 @Getter
 @Setter
+@Builder
+@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User {
 
@@ -21,6 +25,7 @@ public class User {
     private Long id;
 
     @Column(name = "public_id", nullable = false, unique = true, updatable = false)
+    @Setter(AccessLevel.NONE)
     private UUID publicId;
 
     @Column(nullable = false, unique = true)
@@ -53,10 +58,16 @@ public class User {
                     referencedColumnName = "id"
             )
     )
-    private List<Role> roles;
+    private Set<Role> roles = new HashSet<>();
+
+    public void addRole(Role role) {
+        this.roles.add(role);
+    }
 
     @PrePersist
     public void onCreate() {
+        publicId = UUID.randomUUID();
+
         Instant instant = Instant.now();
         createdAt = instant;
         updatedAt = instant;
