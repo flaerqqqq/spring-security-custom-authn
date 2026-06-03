@@ -11,6 +11,7 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -19,6 +20,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @Sql(
         scripts = {
+                "/sql/auth/cleanup.sql",
                 "/sql/auth/users.sql",
                 "/sql/auth/users-roles.sql"
         },
@@ -67,5 +69,30 @@ public class AuthenticationControllerIT extends AbstractIntegrationTest {
                     assertThat(passwordEncoder.matches("password", securityUser.getPassword()))
                             .isTrue();
                 });
+    }
+
+    @Test
+    void logout_ClearsSecurityContextAndInvalidatesHttpSession() throws Exception {
+        UserUsernamePasswordLoginRequestDto loginRequestDto = new UserUsernamePasswordLoginRequestDto(
+                "username",
+                "password"
+        );
+
+        MvcResult loginResult = mockMvc.perform(post("/api/v1/auth/login/password")
+                        .contentType(MEDIA_JSON)
+                        .content(objectMapper.writeValueAsString(loginRequestDto)))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        MockHttpSession session = (MockHttpSession) loginResult.getRequest().getSession(false);
+
+        assertThat(session).isNotNull();
+
+        mockMvc.perform(post("/api/v1/auth/logout")
+                        .session(session))
+                .andExpect(status().isNoContent())
+                .andReturn();
+
+        assertThat(session.isInvalid()).isTrue();
     }
 }

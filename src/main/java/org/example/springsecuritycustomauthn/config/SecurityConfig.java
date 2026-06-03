@@ -1,5 +1,6 @@
 package org.example.springsecuritycustomauthn.config;
 
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -35,6 +36,12 @@ public class SecurityConfig {
                                                    SecurityContextRepository securityContextRepository) {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
+                .logout(logout -> logout
+                        .logoutUrl("/api/v1/auth/logout")
+                        .invalidateHttpSession(true)
+                        .logoutSuccessHandler((request, response, authentication) ->
+                                response.setStatus(HttpServletResponse.SC_NO_CONTENT))
+                )
                 .securityContext(context -> context
                         .securityContextRepository(securityContextRepository)
                 )
