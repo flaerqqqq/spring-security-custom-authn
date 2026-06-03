@@ -1,10 +1,7 @@
 package org.example.springsecuritycustomauthn.mapper;
 
 import org.example.springsecuritycustomauthn.config.GlobalMapperConfig;
-import org.example.springsecuritycustomauthn.dto.user.UserDetailsDto;
-import org.example.springsecuritycustomauthn.dto.user.UserDetailsResponseDto;
-import org.example.springsecuritycustomauthn.dto.user.UserRegisterDto;
-import org.example.springsecuritycustomauthn.dto.user.UserRegisterRequestDto;
+import org.example.springsecuritycustomauthn.dto.user.*;
 import org.example.springsecuritycustomauthn.model.entity.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -26,4 +23,8 @@ public interface UserMapper {
     UserRegisterDto toRegisterDto(UserRegisterRequestDto registerRequestDto);
 
     UserDetailsResponseDto toDetailsResponseDto(UserDetailsDto detailsDto);
+
+    UserUsernamePasswordLoginDto toUsernamePasswordLoginDto(
+            UserUsernamePasswordLoginRequestDto userUsernamePasswordLoginRequestDto
+    );
 }
