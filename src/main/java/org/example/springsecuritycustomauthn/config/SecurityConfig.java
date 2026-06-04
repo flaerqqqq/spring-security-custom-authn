@@ -29,38 +29,12 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityContextRepository securityContextRepository() {
-        return new HttpSessionSecurityContextRepository();
-    }
-
-    @Bean
     @Order(1)
     public SecurityFilterChain jwtSecurityFilterChain(HttpSecurity http) {
         return http
-                .securityMatcher("/api/**")
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .build();
     }
-
-    @Bean
-    @Order(2)
-    public SecurityFilterChain securityFilterChain(HttpSecurity http,
-                                                   SecurityContextRepository securityContextRepository) {
-        return http
-                .securityMatcher("/**")
-                .csrf(AbstractHttpConfigurer::disable)
-                .logout(logout -> logout
-                        .logoutUrl("/api/v1/auth/logout")
-                        .invalidateHttpSession(true)
-                        .logoutSuccessHandler((request, response, authentication) ->
-                                response.setStatus(HttpServletResponse.SC_NO_CONTENT))
-                )
-                .securityContext(context -> context
-                        .securityContextRepository(securityContextRepository)
-                )
-                .build();
-    }
-
 }
