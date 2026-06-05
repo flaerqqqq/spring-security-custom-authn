@@ -29,15 +29,12 @@ public class JwtTokenServiceImpl implements JwtTokenService{
     private final JwtEncoder jwtEncoder;
     private final JwtProperties jwtProperties;
 
-    @Value("${spring.application.name}")
-    private String applicationName;
-
     @Override
     public String generateAccessToken(Authentication authentication) {
         Assert.notNull(authentication, AUTHENTICATION_NOT_NULL);
 
         JwsHeader jwsHeader = JwsHeader.with(SignatureAlgorithm.RS256)
-                .keyId("loca-dev-key-1")
+                .keyId(jwtProperties.getKeyId())
                 .build();
 
         JwtClaimsSet jwtClaimsSet = buildClaims(authentication);
@@ -60,8 +57,8 @@ public class JwtTokenServiceImpl implements JwtTokenService{
                     .issuedAt(issuedAt)
                     .expiresAt(expiresAt)
                     .subject(su.getPublicId().toString())
-                    .issuer(applicationName)
-                    .audience(List.of(applicationName))
+                    .issuer(jwtProperties.getIssuer())
+                    .audience(jwtProperties.getAudience())
                     .build();
         } else {
             throw new RuntimeException("Authentication principal is not of type SecurityUser");
