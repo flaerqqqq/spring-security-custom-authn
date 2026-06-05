@@ -9,6 +9,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.util.Assert;
 
 import java.util.Collection;
+import java.util.UUID;
 
 public class SecurityUser implements UserDetails {
 
@@ -48,5 +49,9 @@ public class SecurityUser implements UserDetails {
     @Override
     public boolean isEnabled() {
         return user.getStatus() != UserStatus.DISABLED;
+    }
+
+    public UUID getPublicId() {
+        return user.getPublicId();
     }
 }

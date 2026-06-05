@@ -3,10 +3,16 @@ package org.example.springsecuritycustomauthn.service.impl;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.example.springsecuritycustomauthn.dto.auth.JwtTokenDto;
 import org.example.springsecuritycustomauthn.dto.user.UserUsernamePasswordLoginDto;
 import org.example.springsecuritycustomauthn.service.AuthenticationService;
+import org.example.springsecuritycustomauthn.service.JwtTokenService;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 import org.springframework.validation.annotation.Validated;
 
 @Validated
@@ -16,8 +22,26 @@ import org.springframework.validation.annotation.Validated;
 @RequiredArgsConstructor
 public class AuthenticationServiceImpl implements AuthenticationService {
 
+    private static final String USER_USERNAME_PASSWORD_LOGIN_DTO_NOT_NULL = "UserUsernamePasswordLoginDto must not be null";
+
+    private final AuthenticationManager authenticationManager;
+    private final JwtTokenService jwtTokenService;
+
     @Override
-    public void login(@Valid UserUsernamePasswordLoginDto loginDto) {
-        // authentication with jwt response
+    public JwtTokenDto login(@Valid UserUsernamePasswordLoginDto loginDto) {
+        Assert.notNull(loginDto, USER_USERNAME_PASSWORD_LOGIN_DTO_NOT_NULL);
+
+        String username = loginDto.getUsername();
+        String password = loginDto.getPassword();
+
+        log.debug("Logging in User with username: {}", username);
+
+        Authentication authRequestToken = new UsernamePasswordAuthenticationToken(username, password);
+        Authentication authenticatedToken = authenticationManager.authenticate(authRequestToken);
+
+        String accessToken = jwtTokenService.generateAccessToken(authenticatedToken);
+        // generate refresh token
+
+        return new JwtTokenDto(accessToken, null);
     }
 }
