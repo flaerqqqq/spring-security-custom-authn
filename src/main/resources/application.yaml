@@ -21,3 +21,11 @@ spring:
 logging:
   level:
     org.springframework.security: DEBUG
+
+app:
+  security:
+    jwt:
+      issuer: test-security-app
+      acess-token-expiration: 300000
+      private-key: ${JWT_PRIVATE_KEY_PATH:classpath:secrets/private.pem}
+      public-key: ${JWT_PUBLIC_KEY_PATH:classpath:secrets/public.pem}
